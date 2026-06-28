@@ -1,0 +1,80 @@
+[package]
+name = "solitaire"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+description = "A classic Windows 3.1-flavored Klondike Solitaire built on the Saudade toolkit"
+authors = ["Robert Lillack <rob@lillack.net>"]
+repository = "https://github.com/roblillack/solitaire"
+homepage = "https://github.com/roblillack/solitaire"
+license = "MIT"
+readme = "README.md"
+keywords = ["solitaire", "klondike", "card-game", "retro", "gui"]
+categories = ["games", "gui"]
+
+# Ship only what's needed to build and use the crate. A whitelist (rather than a
+# growing `exclude`) guarantees we never accidentally publish the test
+# baselines, the bundled fonts, the demo GIF / screenshots, or CI config.
+# `assets/**/*.svg` must ship: `include_svg!` reads them at *compile* time, so a
+# downstream `cargo build` needs them present in the published crate.
+include = [
+    "src/**/*.rs",
+    "assets/**/*.svg",
+    "Cargo.toml",
+    "Cargo.lock",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+]
+
+# cargo-release settings. Single crate, no workspace, so everything lives here.
+[package.metadata.release]
+# Only ever cut a release from `main`.
+allow-branch = ["main"]
+pre-release-replacements = [
+    # Roll CHANGELOG's [Unreleased] over to the new version and re-seed a fresh
+    # [Unreleased] above it (the Keep a Changelog + cargo-release marker idiom).
+    # Order matters: the version/date/compare substitutions run first, *then*
+    # the markers re-insert the literal "Unreleased"/"ReleaseDate" tokens so the
+    # next release finds them again.
+    { file = "CHANGELOG.md", search = "Unreleased", replace = "{{version}}" },
+    { file = "CHANGELOG.md", search = '\.\.\.HEAD', replace = "...{{tag_name}}", exactly = 1 },
+    { file = "CHANGELOG.md", search = "ReleaseDate", replace = "{{date}}" },
+    { file = "CHANGELOG.md", search = "<!-- next-header -->", replace = "<!-- next-header -->\n\n## [Unreleased] - ReleaseDate", exactly = 1 },
+    { file = "CHANGELOG.md", search = "<!-- next-url -->", replace = "<!-- next-url -->\n[Unreleased]: https://github.com/roblillack/solitaire/compare/{{tag_name}}...HEAD", exactly = 1 },
+]
+
+[features]
+# Compiles the GIF recorder backend into the demo example so it can drive the
+# real UI headlessly and write `demo.gif`. Without it, `cargo run --example
+# demo` plays the same scripted game live in a real window instead.
+recorder = []
+
+[dependencies]
+# The Saudade toolkit the game is built on, from crates.io. `include_svg!` (used
+# for the card pips) and the `SvgImage` runtime are both re-exported from here,
+# so no separate `saudade-macros` dependency is needed.
+saudade = "0.5"
+
+[dev-dependencies]
+# Pixel-snapshot baselines for the UI (see tests/snapshots.rs).
+insta = "1"
+# The demo recorder encodes the captured frames into demo.gif.
+gif = "0.14"
+# The demo recorder's optional per-frame PNG dump (SOLITAIRE_DEMO_FRAMES).
+png = "0.17"
+
+# The library half (game engine + ui) is what the snapshot tests and examples
+# link against; main.rs is the thin binary on top of it.
+[lib]
+name = "solitaire"
+path = "src/lib.rs"
+
+[[bin]]
+name = "solitaire"
+path = "src/main.rs"
+
+# The demo lives in examples/demo/ with a main.rs entry point.
+[[example]]
+name = "demo"
+path = "examples/demo/main.rs"

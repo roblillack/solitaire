@@ -1,0 +1,8 @@
+/target
+
+# Rendered frames dumped by snapshot tests on failure (see
+# tests/common/mod.rs); inspect locally / via CI artifacts.
+*.snap.actual.png
+
+# Frame dumps from the demo recorder (SOLITAIRE_DEMO_FRAMES=<dir>).
+/frames

@@ -1,0 +1,8 @@
+# cargo-release configuration.
+#
+# Single crate, no workspace: the README install-snippet and CHANGELOG rewrites
+# live in `[package.metadata.release]` in Cargo.toml. This file only carries the
+# branch guard so a release can't accidentally be cut from a feature branch.
+
+# Only ever cut a release from `main`.
+allow-branch = ["main"]
