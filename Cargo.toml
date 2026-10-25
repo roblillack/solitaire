@@ -54,7 +54,7 @@ recorder = []
 # The Saudade toolkit the game is built on, from crates.io. `include_svg!` (used
 # for the card pips) and the `SvgImage` runtime are both re-exported from here,
 # so no separate `saudade-macros` dependency is needed.
-saudade = "0.5"
+saudade = { version = "0.7" }
 
 [dev-dependencies]
 # Pixel-snapshot baselines for the UI (see tests/snapshots.rs).
@@ -62,7 +62,7 @@ insta = "1"
 # The demo recorder encodes the captured frames into demo.gif.
 gif = "0.14"
 # The demo recorder's optional per-frame PNG dump (SOLITAIRE_DEMO_FRAMES).
-png = "0.17"
+png = "0.18"
 
 # The library half (game engine + ui) is what the snapshot tests and examples
 # link against; main.rs is the thin binary on top of it.
